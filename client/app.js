@@ -2,6 +2,7 @@
 
 var app = angular.module('acougue', [
 	'ngRoute',
+	'angular-flot',
 	'controllers'
 ]);
 

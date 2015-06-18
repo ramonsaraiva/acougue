@@ -14,3 +14,9 @@ class DataCollector(object):
     @staticmethod
     def client_left():
         DataCollector.client_outgoing_count = DataCollector.client_outgoing_count + 1
+
+    @staticmethod
+    def reset():
+        DataCollector.client_incoming = []
+        DataCollector.client_outgoing = []
+        DataCollector.client_outgoing_count = 0

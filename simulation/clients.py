@@ -9,7 +9,9 @@ class Client(object):
         self._cashier = cashier
         self._meat = meat
         self._grocery = grocery
-        self._priority = 1
+
+        self._times = {}
+        self._times['entered'] = self._env.now
 
         self._behaviour = self.define_behaviour
         self._env.process(self._behaviour())
@@ -38,22 +40,59 @@ class Client(object):
 
     def get_meat(self):
         with self._meat.request() as request:
+            self._times['meat_queue'] = self._env.now
             yield request
-            print('Client getting meat at {0}'.format(self._env.now))
-            yield self._env.timeout(self._meat.service_time)
-            print('Client got meat at {0}'.format(self._env.now))
+            self._times['meat_start'] = self._env.now
+            service_time = self._meat.service_time
+            yield self._env.timeout(service_time)
+            self._times['meat_end'] = self._env.now
+            self._times['meat_wait'] = service_time
 
     def get_grocery(self):
         with self._grocery.request() as request:
+            self._times['grocery_queue'] = self._env.now
             yield request
-            print('Client getting grocery at {0}'.format(self._env.now))
-            yield self._env.timeout(self._grocery.service_time)
-            print('Client got grocery at {0}'.format(self._env.now))
+            self._times['grocery_start'] = self._env.now
+            service_time = self._grocery.service_time
+            yield self._env.timeout(service_time)
+            self._times['grocery_end'] = self._env.now
+            self._times['grocery_wait'] = service_time
 
     def pay(self):
         with self._cashier.request(type(self)) as request:
+            self._times['cashier_queue'] = self._env.now
             yield request
-            print('Client got cashier at {0}'.format(self._env.now))
-            yield self._env.timeout(self._cashier.service_time)
-            print('Client left cashier at {0}'.format(self._env.now))
+            self._times['cashier_start'] = self._env.now
+            service_time = self._cashier.service_time
+            yield self._env.timeout(service_time)
+            self._times['cashier_end'] = self._env.now
+            self._times['cashier_wait'] = service_time
             DataCollector.client_left()
+
+    @property
+    def serialize(self):
+        return self._times
+
+class Truck(object):
+    def __init__(self, env, cashier):
+        self._env = env
+        self._cashier = cashier
+
+        self._times = {}
+        self._times['entered'] = self._env.now
+
+        self._behaviour = self._env.process(self.behaviour())
+
+    def behaviour(self):
+        with self._cashier.request(type(self)) as request:
+            self._times['cashier_queue'] = self._env.now
+            yield request
+            self._times['cashier_start'] = self._env.now
+            service_time = self._cashier.service_time_truck
+            yield self._env.timeout(service_time)
+            self._times['cashier_end'] = self._env.now
+            self._times['cashier_wait'] = service_time
+
+    @property
+    def serialize(self):
+        return self._times
