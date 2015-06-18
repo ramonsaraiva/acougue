@@ -2,10 +2,11 @@ import random
 import simpy
 
 class Client(object):
-    def __init__(self, env, cashier, meat_slicer):
+    def __init__(self, env, cashier, meat, grocery):
         self._env = env
         self._cashier = cashier
-        self._meat_slicer = meat_slicer
+        self._meat = meat
+        self._grocery = grocery
         self._priority = 1
 
         self._behaviour = self.define_behaviour
@@ -34,16 +35,18 @@ class Client(object):
         self._env.process(self.pay())
 
     def get_meat(self):
-        with self._meat_slicer.request() as request:
+        with self._meat.request() as request:
             yield request
             print('Client getting meat at {0}'.format(self._env.now))
-            yield self._env.timeout(self._meat_slicer.service_time)
+            yield self._env.timeout(self._meat.service_time)
             print('Client got meat at {0}'.format(self._env.now))
 
     def get_grocery(self):
-        print('Client getting grocery at {0}'.format(self._env.now))
-        yield self._env.timeout(random.uniform(1, 10))
-        print('Client got grocery at {0}'.format(self._env.now))
+        with self._grocery.request() as request:
+            yield request
+            print('Client getting grocery at {0}'.format(self._env.now))
+            yield self._env.timeout(self._grocery.service_time)
+            print('Client got grocery at {0}'.format(self._env.now))
 
     def pay(self):
         with self._cashier.request(type(self)) as request:

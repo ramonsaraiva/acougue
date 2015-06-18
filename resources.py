@@ -48,3 +48,7 @@ class MeatServant(SimpleServant):
 class GroceryArea(SimpleServant):
     def __init__(self, env, capacity):
         SimpleServant.__init__(self, env, capacity)
+
+    @property
+    def service_time(self):
+        return random.uniform(1, 10)
