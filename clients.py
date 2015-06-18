@@ -11,7 +11,6 @@ class Client(object):
         self._behaviour = self.define_behaviour
         self._behaviour()
 
-
     @property
     def define_behaviour(self):
         r = random.uniform(0, 1)
@@ -47,7 +46,7 @@ class Client(object):
         print('Client got grocery at {0}'.format(self._env.now))
 
     def pay(self):
-        with self._cashier.request(self._priority) as request:
+        with self._cashier.request(type(self)) as request:
             yield request
             print('Client got cashier at {0}'.format(self._env.now))
             yield self._env.timeout(self._cashier.service_time)

@@ -13,4 +13,4 @@ if __name__ == '__main__':
 
     client_generator = ClientGenerator(environment, cashier, meat_slicer)
 
-    environment.run(until=10)
+    environment.run(until=20)
