@@ -1,54 +1,23 @@
-import simpy
-import random
+from flask import jsonify
 
-from clients import Client
+from flask.ext.restful import Resource
+from flask.ext.restful import reqparse
 
-class Servant(object):
-    def __init__(self, env, capacity):
-        self._env = env
-        self._capacity = capacity
+from simulation.simulation import execute_simulation
 
-class SimpleServant(Servant):
-    def __init__(self, env, capacity):
-        Servant.__init__(self, env, capacity)
-        self._resource = simpy.Resource(self._env, capacity=self._capacity)
+class Simulation(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('cashiers', type=int, location='json', required=True)
+        self.reqparse.add_argument('meats', type=int, location='json', required=True)
+        self.reqparse.add_argument('grocery_area', type=int, location='json', required=True)
+        self.reqparse.add_argument('client_lambda', type=float, location='json', required=True)
+        self.reqparse.add_argument('truck_lambda', type=float, location='json', required=True)
 
-    def request(self):
-        return self._resource.request()
+    def get(self, id):
+        return {}
 
-class PriorityServant(Servant):
-    def __init__(self, env, capacity):
-        Servant.__init__(self, env, capacity)
-        self._resource = simpy.PriorityResource(self._env, capacity=self._capacity)
-        self._priorities = {}
-
-    def request(self, t):
-        return self._resource.request(self._priorities[t])
-
-class CashierServant(PriorityServant):
-    def __init__(self, env, capacity):
-        PriorityServant.__init__(self, env, capacity)
-        self.define_priorities()
-
-    def define_priorities(self):
-        self._priorities[Client] = 1
-
-    @property
-    def service_time(self):
-        return random.uniform(0.5, 3)
-
-class MeatServant(SimpleServant):
-    def __init__(self, env, capacity):
-        SimpleServant.__init__(self, env, capacity)
-
-    @property
-    def service_time(self):
-        return random.uniform(3, 10)
-
-class GroceryArea(SimpleServant):
-    def __init__(self, env, capacity):
-        SimpleServant.__init__(self, env, capacity)
-
-    @property
-    def service_time(self):
-        return random.uniform(1, 10)
+    def post(self):
+        configuration = self.reqparse.parse_args()
+        execute_simulation(configuration)
+        return {'ok': 'ok'}

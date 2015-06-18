@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html ng-app="acougue">
+	<head>
+		<title>Acougue simulation</title>
+
+		<!-- base css -->
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+		<!-- custom css -->
+		<link rel ="stylesheet" href="css/main.css">
+
+		<!-- base js -->
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="bower_components/angular/angular.min.js"></script>
+
+		<!-- angular add -->
+		<script src="bower_components/angular-route/angular-route.min.js"></script>
+
+		<!-- angular app -->
+		<script src="app.js"></script>
+		<script src="controllers.js"></script>
+	</head>
+
+	<body>
+		<div ng-controller="main_controller">
+			<div class="row">
+				<div class="col-xs-6 col-xs-offset-3">
+					<div class="text-center">
+						<h1 text="center"><strong>Acougue <small><strong>configuration</strong></small></strong></h1>
+					</div>
+					<div class="row">
+						<div class="col-xs-6">
+							<h3>Capacities</h3>
+							<div class="form-group">
+								<label>Cashiers</label>
+								<input ng-model="configuration.cashiers" type="text" class="form-control" />
+							</div>
+							<div class="form-group">
+								<label>Meat slicers</label>
+								<input ng-model="configuration.meats" type="text" class="form-control" />
+							</div>
+							<div class="form-group">
+								<label>Grocery Area</label>
+								<input ng-model="configuration.grocery_area" type="text" class="form-control" />
+							</div>
+						</div>
+						<div class="col-xs-6">
+							<h3>Incoming</h3>
+							<div class="form-group">
+								<label>Clients incoming poisson lambda</label>
+								<input ng-model="configuration.client_lambda" type="text" class="form-control" />
+							</div>
+							<div class="form-group">
+								<label>Truck delivery poisson lambda</label>
+								<input ng-model="configuration.truck_lambda" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-6">
+							<button class="btn btn-primary form-control" ng-click="simulate()"><strong>Simulate</strong></button>
+						</div>
+						<div class="col-xs-6">
+							<button class="btn btn-success form-control" ng-click="default_config()"><strong>Load default configuration</strong></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

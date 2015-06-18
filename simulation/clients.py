@@ -1,6 +1,8 @@
 import random
 import simpy
 
+from collectors import DataCollector
+
 class Client(object):
     def __init__(self, env, cashier, meat, grocery):
         self._env = env
@@ -10,29 +12,29 @@ class Client(object):
         self._priority = 1
 
         self._behaviour = self.define_behaviour
-        self._behaviour()
+        self._env.process(self._behaviour())
 
     @property
     def define_behaviour(self):
         r = random.uniform(0, 1)
-        if r <= 0.2:
-            return self.just_meat
         if r <= 0.5:
+            return self.just_meat
+        if r <= 0.7:
             return self.both
         return self.just_grocery
 
     def just_meat(self):
-        self._env.process(self.get_meat())
-        self._env.process(self.pay())
+        yield self._env.process(self.get_meat())
+        yield self._env.process(self.pay())
 
     def just_grocery(self):
-        self._env.process(self.get_grocery())
-        self._env.process(self.pay())
+        yield self._env.process(self.get_grocery())
+        yield self._env.process(self.pay())
 
     def both(self):
-        self._env.process(self.get_meat())
-        self._env.process(self.get_grocery())
-        self._env.process(self.pay())
+        yield self._env.process(self.get_meat())
+        yield self._env.process(self.get_grocery())
+        yield self._env.process(self.pay())
 
     def get_meat(self):
         with self._meat.request() as request:
@@ -54,3 +56,4 @@ class Client(object):
             print('Client got cashier at {0}'.format(self._env.now))
             yield self._env.timeout(self._cashier.service_time)
             print('Client left cashier at {0}'.format(self._env.now))
+            DataCollector.client_left()
